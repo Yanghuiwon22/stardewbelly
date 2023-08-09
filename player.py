@@ -31,7 +31,6 @@ class Player(pygame.sprite.Sprite):
         for animation in self.animations.keys():
             full_path = "C:\code\stardewbelly-main\s1 - setup\graphics\character/" + animation
             self.animations[animation] = import_folder(full_path)
-
     def animate(self, dt):
         if self.direction != (0,0):
             self.index_frame += 4 * dt
@@ -48,7 +47,6 @@ class Player(pygame.sprite.Sprite):
                 self.index_frame /= 4
 
         self.image = self.animations[self.status][int(self.index_frame)]# -------> 크기
-
     def input(self):
         keys = pygame.key.get_pressed()
         # print("D")
@@ -66,17 +64,14 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = -1
         else:
             self.direction.x = 0
-
     def get_status(self,dt):
-        if self.direction == [0,0]:
-            self.index_frame += 4 * dt
+        self.index_frame += 4 * dt
 
-            self.status += "_idle"
-            self.image = self.animations[self.status][int(self.index_frame)]  # -------> 크기
-
+        if self.direction.magnitude() == 0:
+            self.status += self.status.split("_")[0] + "_idle"
     def move(self, dt):
         # normalizing a vector
-        if self.direction.magnitude() >0:
+        if self.direction.magnitude() > 0:
             self.direction = self.direction.normalize()
 
         # horizontal movement
@@ -89,7 +84,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
         self.input()
+        self.get_status(dt)
         self.move(dt)
         self.animate(dt)
-        self.get_status(dt)
 
