@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 200
 
         #tools
+        self.selected_tool = "_axe"
 
     def import_assets(self):
         self. animations = {"up" : [], "down" : [], 'left' : [], "right" : [],
@@ -32,43 +33,48 @@ class Player(pygame.sprite.Sprite):
             full_path = "C:\code\stardewbelly-main\s1 - setup\graphics\character/" + animation
             self.animations[animation] = import_folder(full_path)
     def animate(self, dt):
-        if self.direction != (0,0):
-            self.index_frame += 4 * dt
-            if self.direction.y == -1:
-                self.status = 'up'
-            if self.direction.y == +1:
-                self.status = 'down'
-            if self.direction.x == -1:
-                self.status = 'left'
-            if self.direction.x == +1:
-                self.status = 'right'
+        self.index_frame += 4 * dt
+        if self.index_frame >= len(self.animations[self.status]):
+            self.index_frame = 0
 
-            if self.index_frame >= 4:
-                self.index_frame /= 4
+            print(self.status)
 
         self.image = self.animations[self.status][int(self.index_frame)]# -------> 크기
     def input(self):
         keys = pygame.key.get_pressed()
-        # print("D")
 
+        # directions
         if keys[pygame.K_UP]:
             self.direction.y = -1
+            self.status = 'up'
         elif keys[pygame.K_DOWN]:
             self.direction.y = +1
+            self.status = 'down'
         else:
             self.direction.y = 0
-
         if keys[pygame.K_RIGHT]:
             self.direction.x = +1
+            self.status = 'right'
         elif keys[pygame.K_LEFT]:
             self.direction.x = -1
+            self.status = 'left'
         else:
             self.direction.x = 0
-    def get_status(self,dt):
-        self.index_frame += 4 * dt
 
+    #     tool use
+        if keys[pygame.K_SPACE]:
+            self.selected_tool = "_hoe"
+        else:
+            
+            self.status = self.status.split("_")[0]
+            print(self.status)
+
+    def get_status(self):
         if self.direction.magnitude() == 0:
-            self.status += self.status.split("_")[0] + "_idle"
+            self.status = self.status.split("_")[0] + "_idle"
+
+    def use_tool(self):
+        self.status = self.status.split('_')[0] + self.selected_tool
     def move(self, dt):
         # normalizing a vector
         if self.direction.magnitude() > 0:
@@ -84,7 +90,9 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
         self.input()
-        self.get_status(dt)
+        self.use_tool()
+
+        self.get_status()
         self.move(dt)
         self.animate(dt)
 
