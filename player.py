@@ -3,7 +3,6 @@ from setting import *
 from support import *
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, group):
-        print("c")
         super().__init__(group)         # -----> super뒤에 ()를 안붙였더니 아래의 에러가 뜸
                                         #  TypeError: descriptor '__init__' requires a 'super' object but received a 'Group'
         self.import_assets()
@@ -17,19 +16,24 @@ class Player(pygame.sprite.Sprite):
 
         # movement attribute
         self.direction = pygame.math.Vector2()
-        print(self.direction)
         self.pos = pygame.math.Vector2(self.rect.center)
         self.speed = 200
 
+        #tools
+
     def import_assets(self):
-        self. animations = {"up" : [], "down" : [], 'left' : [], "right" : []}
+        self. animations = {"up" : [], "down" : [], 'left' : [], "right" : [],
+                            "up_idle" : [], "down_idle" : [], 'left_idle' : [], "right_idle" : [],
+                            "up_hoe": [], "down_hoe": [], 'left_hoe': [], "right_hoe": [],
+                            "up_axe": [], "down_axe": [], 'left_axe': [], "right_axe": [],
+                            "up_water": [], "down_water": [], 'left_water': [], "right_water": []}
+
         for animation in self.animations.keys():
-            full_path = "C:\code\stardewbelly-main\graphics\character/" + animation
+            full_path = "C:\code\stardewbelly-main\s1 - setup\graphics\character/" + animation
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt):
         if self.direction != (0,0):
-            print(self.direction)
             self.index_frame += 4 * dt
             if self.direction.y == -1:
                 self.status = 'up'
@@ -63,20 +67,28 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+    def get_status(self,dt):
+        if self.direction == [0,0]:
+            self.index_frame += 4 * dt
+            print("a")
+            self.status += "_idle"
+            self.image = self.animations[self.status][int(self.index_frame)]  # -------> 크기
+
     def move(self, dt):
         # normalizing a vector
         if self.direction.magnitude() >0:
             self.direction = self.direction.normalize()
 
         # horizontal movement
-        self.pos.x += self.direction * self.speed * dt
+        self.pos.x += self.direction.x * self.speed * dt
         self.rect.centerx = self.pos.x
 
         # vertical movement
-        self.pos.y += self.direction * self.speed * dt
+        self.pos.y += self.direction.y * self.speed * dt
         self.rect.centery = self.pos.y
 
     def update(self, dt):
         self.input()
         self.move(dt)
         self.animate(dt)
+        self.get_status(dt)
