@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
     def get_status(self,dt):
         if self.direction == [0,0]:
             self.index_frame += 4 * dt
-            print("a")
+
             self.status += "_idle"
             self.image = self.animations[self.status][int(self.index_frame)]  # -------> 크기
 
@@ -92,3 +92,4 @@ class Player(pygame.sprite.Sprite):
         self.move(dt)
         self.animate(dt)
         self.get_status(dt)
+
